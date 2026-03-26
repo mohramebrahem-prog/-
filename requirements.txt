@@ -1,0 +1,11 @@
+flask==3.0.3
+gunicorn==22.0.0
+
+# ✅ CORS — يمنع مواقع أخرى من الوصول لـ /api/verify
+flask-cors>=4.0.0
+
+# ✅ تشفير حقيقي — نفس مكتبة البوت
+cryptography>=42.0.0
+
+# ══ PostgreSQL ══
+psycopg2-binary>=2.9.9
