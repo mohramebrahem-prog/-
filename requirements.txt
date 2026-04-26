@@ -1,5 +1,6 @@
 flask==3.0.3
 gunicorn==22.0.0
+flask-compress>=1.14
 
 # ✅ CORS — يمنع مواقع أخرى من الوصول لـ /api/verify
 flask-cors>=4.0.0

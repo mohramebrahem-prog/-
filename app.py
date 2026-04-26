@@ -27,6 +27,10 @@ except ImportError:
 app = Flask(__name__, static_folder="static")
 app.config['MAX_CONTENT_LENGTH'] = 1 * 1024 * 1024  # ✅ حد 1MB للطلبات
 
+# ✅ ضغط تلقائي للاستجابات — يقلل حجم الصفحة من 3.3MB إلى ~300KB
+from flask_compress import Compress
+Compress(app)
+
 logging.basicConfig(level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s")
 logger = logging.getLogger(__name__)
