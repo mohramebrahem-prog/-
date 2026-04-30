@@ -27,10 +27,6 @@ except ImportError:
 app = Flask(__name__, static_folder="static")
 app.config['MAX_CONTENT_LENGTH'] = 1 * 1024 * 1024  # ✅ حد 1MB للطلبات
 
-# ✅ ضغط تلقائي للاستجابات — يقلل حجم الصفحة من 3.3MB إلى ~300KB
-from flask_compress import Compress
-Compress(app)
-
 logging.basicConfig(level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s")
 logger = logging.getLogger(__name__)
@@ -444,10 +440,24 @@ def verify():
         leave_from = report["leave_date"] or ""
         leave_to   = report["leave_date"] or ""
 
+    # ── للتقارير الخارجية: تصحيح leave_from/leave_to و days من report_data ──
+    _rtype = report["report_type"]
+    if _rtype == "external":
+        _ext_leave_from = extra.get("leave_from", "")
+        _ext_leave_to   = extra.get("leave_to",   "")
+        if _ext_leave_from:
+            leave_from = _ext_leave_from
+        if _ext_leave_to:
+            leave_to = _ext_leave_to
+        if not leave_from:
+            leave_from = report["leave_date"] or ""
+        if not leave_to:
+            leave_to = leave_from
+
     result = {
         "success":          True,
         "report_number":    report["report_number"],
-        "report_type":      "رسمي" if report["report_type"] == "official" else "ورقي",
+        "report_type":      "رسمي",
         "patient_name":     report["patient_name"],
         "national_id":      national_id[:3] + "****" + national_id[-3:],
         "nationality":      report["nationality"],
@@ -455,9 +465,9 @@ def verify():
         "leave_date":       report["leave_date"],
         "leave_from":       leave_from,
         "leave_to":         leave_to,
-        "days":             report["days"],
-        "doctor_name":      report["doctor_name"],
-        "doctor_specialty": report["doctor_specialty"],
+        "days":             str(extra.get("days", "") or report["days"] or ""),
+        "doctor_name":      extra.get("doctor_name", "") or report["doctor_name"] or "",
+        "doctor_specialty": extra.get("doctor_specialty", "") or report["doctor_specialty"] or "",
         "hospital_name":    report["hospital_name"],
         "issue_date":       issue_date,
         "birth_date":       extra.get("birth_date", ""),
